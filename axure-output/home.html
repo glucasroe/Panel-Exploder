@@ -173,7 +173,6 @@
       <div class="modal__close">&times;</div>
       <h2 class="modal__stateName">Panel State Name</h2>
     </div>
-    <script type="text/javascript" src="jquery.actual.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
         body = $('body');
@@ -192,7 +191,6 @@
         //  1.2: For each panel, place template
         $('.ax_dynamic_panel').each(function(){ //Loop over panels
          if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
-           //$(this).addClass('explodable');
 
           //    1.2.2: String manipulate to set ID
           panelID = $(this).attr('id'); //Get
@@ -209,12 +207,13 @@
           panelWidth = $('#u0_state0').width();
           //If height = 0 then it's coming through the viewer
           if(panelWidth == '0'){
-            panelWidth = $(this).actual('width');
-            console.log(panelWidth);
+            childState = $(this).find('.ax_shape');
+            panelWidth = $(childState).css('width');
 
+            //Still broken.
           }
           //otherwise measure it with actual?
-
+          console.log(panelWidth);
           //      1.2.3.3: x = panelX + stateW - toggleW Wait, shit, this is fragile if states can have multiple sizes. Is it worth trying to find the largest one?
           //               y = panelY
           toggleTarget = $('#'+ toggleID);
