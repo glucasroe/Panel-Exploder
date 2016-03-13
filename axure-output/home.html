@@ -179,11 +179,12 @@
         body = $('body');
         panel = $('.ax_dynamic_panel');
         toggles = $('.exploder__toggles');
-        exploderToggle = $('.exploder_toggle');
+        exploderToggle = $('.exploder__toggle');
+
 
         //Modal Elements
-        modal = $('.panel_exploder_modal');
-        closeButton = $('.panel_exploder_close');
+        modal = $('.exploder__modal');
+        closeButton = $('.modal__close');
         panelName = $('.panel_name');
 
         //1: Build the annotations
@@ -223,13 +224,25 @@
 
         //3: Explode Panel
         //  3.1: String manipulate to target panel ID
+        $('.exploder__toggle').click(function(){
+          toggleID = $(this).attr('ID');
+          panelID = toggleID.substr(0, toggleID.length-8);
+          targetablePanel = $('#' + panelID);
         //  3.2: Copy panel contents into viewer window
-        //  3.3: Sort states to be in correct order
+          $(targetablePanel).clone().appendTo(modal);
+        //  3.3: Sort states to be in correct order - This might be hard
         //  3.4: Display viewer
+          $(modal).removeClass('exploder--hidden');
+        });
 
-        //4: Close Panel
+
+        //4: Close Modal
+        $(closeButton).click(function() {
         //  4.1 Hide viewer
+          $(modal).addClass('exploder--hidden');
         //  4.2 Delete children
+          $('.exploder__modal .ax_dynamic_panel').remove();
+        });
       });
       </script>
 
@@ -280,6 +293,27 @@
           font-family: Helvetica, Arial, sans;
           color: white;
         }
+
+        .exploder__modal .ax_dynamic_panel{
+          z-index: 1001;
+          height: auto !important;
+          top: auto !important;
+          margin: 0 auto 0;
+          position: relative !important;
+        }
+        .state_label{
+          text-align: center;
+          color: white;
+          font-family: Helvetica,Arial,sans;
+          margin: 20px auto 5px;
+        }
+        .exploder__modal .panel_state{
+          margin: 0 auto 0;
+          display:block !important;
+          visibility: visible !important;
+          position:relative !important;
+        }
+
         .exploder--hidden{
           display:none;
           visability: none;
