@@ -199,15 +199,22 @@
 
           //    1.2.1: Duplicate template
           $(toggles).append('<input type="button" value="+" class="exploder__toggle" id="' + toggleID + '"></input>');
-           //<input type="button" value="+" class="exploder__toggle" id="exploder__toggle--sample"></input>
+
+          //    1.2.3: Measure panel placement
+          //      1.2.3.1: Get panel x + y
+          panelPosition = $(this).position();
+          //      1.2.3.2: Get panel states w
+          panelWidth = $(this).outerWidth();
+          //      1.2.3.3: x = panelX + stateW - toggleW Wait, shit, this is fragile if states can have multiple sizes. Is it worth trying to find the largest one?
+          //               y = panelY
+          toggleTarget = $('#'+ toggleID);
+          toggleW = $(toggleTarget).outerWidth()
+          toggleX = (panelPosition.left + panelWidth) - toggleW;
+          toggleY = panelPosition.top;
+          //    1.2.4: Apply values to template instance
+          $(toggleTarget).css({ top: toggleY + "px", left: toggleX + "px"});
           }
         });
-        //    1.2.3: Measure panel placement
-        //      1.2.3.1: Get panel x + y
-        //      1.2.3.2: Get panel states w
-        //      1.2.3.3: x = panelX + stateW - toggleW Wait, shit, this is fragile if states can have multiple sizes. Is it worth trying to find the largest one?
-        //               y = panelY
-        //    1.2.4: Apply values to template instance
 
         //2: Show and hide functions
         //  2.1: Initialization
@@ -246,6 +253,8 @@
           left: 0;
           border:0;
           padding:0.5em;
+          pointer-events: auto;
+          cursor: pointer;
           background-color:blue;
           color: white;
           font-size: 1em;
