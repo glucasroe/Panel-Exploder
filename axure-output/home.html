@@ -166,7 +166,7 @@
     </div>
     <!-- PLUGIN BEGIN-->
     <div class="exploder__toggles">
-        <input type="button" value="+" class="exploder__toggle" id="exploder__toggle--sample"></input>
+        <!--<input type="button" value="+" class="exploder__toggle" id="exploder__toggle--sample"></input>-->
     </div>
     <div class="exploder__modal exploder--hidden">
       <h1 class="modal__title">Modal Title</h1>
@@ -178,6 +178,7 @@
       $(document).ready(function() {
         body = $('body');
         panel = $('.ax_dynamic_panel');
+        toggles = $('.exploder__toggles');
         exploderToggle = $('.exploder_toggle');
 
         //Modal Elements
@@ -188,12 +189,23 @@
         //1: Build the annotations
         //  1.1: Create Annotation Template
         //  1.2: For each panel, place template
-        //    1.2.1: Duplicate template
-        //    1.2.2: String manipulate to place ID
+        $('.ax_dynamic_panel').each(function(){ //Loop over panels
+         if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
+           //$(this).addClass('explodable');
+
+          //    1.2.2: String manipulate to set ID
+          panelID = $(this).attr('id'); //Get
+          toggleID = panelID + '--toggle';
+
+          //    1.2.1: Duplicate template
+          $(toggles).append('<input type="button" value="+" class="exploder__toggle" id="' + toggleID + '"></input>');
+           //<input type="button" value="+" class="exploder__toggle" id="exploder__toggle--sample"></input>
+          }
+        });
         //    1.2.3: Measure panel placement
         //      1.2.3.1: Get panel x + y
         //      1.2.3.2: Get panel states w
-        //      1.2.3.3: x = panelX + stateW - toggleW
+        //      1.2.3.3: x = panelX + stateW - toggleW Wait, shit, this is fragile if states can have multiple sizes. Is it worth trying to find the largest one?
         //               y = panelY
         //    1.2.4: Apply values to template instance
 
@@ -211,6 +223,7 @@
         //4: Close Panel
         //  4.1 Hide viewer
         //  4.2 Delete children
+      });
       </script>
 
       <style>

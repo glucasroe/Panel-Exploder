@@ -1,0 +1,175 @@
+<div class="panel_exploder_modal">
+  <h1 class="panel_name"></h1>
+  <div class="panel_exploder_close">&times;</div>
+</div>
+<!-- (see comment on line 50) <input type="checkbox" class="exploder_init"></input>-->
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    body = $('body');
+    panel = $('.ax_dynamic_panel');
+    exploderToggle = $('.exploder_toggle');
+
+    //Modal Elements
+    modal = $('.panel_exploder_modal');
+    closeButton = $('.panel_exploder_close');
+    panelName = $('.panel_name');
+
+    //If a panel has multiple states, show the toggle option
+   /* $(panel).each(function(){ //Loop over panels
+     if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
+       $(this).prepend('<div class="exploder_toggle">+</div>'); //Add a toggle as the first child
+       //Note: This addition to the DOM is what is causing the standard click
+       //functionality to break, as Axure apparently registers and checks each
+       //DOM item for visibility. It's not very elegant, and I'm seeing if axQuery
+       //has any methods for adding or removing items from the dom.
+       console.log('added');
+      }
+    });
+
+    /* This was an attempt to link into Axure's internal message system to show the
+       exploder toggle only when elements were highlighted. It works to hide and show
+       the toggles, but breaks all other interactivity.
+
+    $axure.internal(function($ax) {
+      $ax.messageCenter.addMessageListener(function(message, data) {
+        if(message == 'highlightInteractive') {
+          if(data == true) {
+            $(panel).each(function(){ //Loop over panels
+                if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
+                  $(this).prepend('<div class="exploder_toggle">+</div>'); //Add a toggle as the first child
+                }
+            });
+          }else{
+            $('.exploder_toggle').remove();
+          }
+        }
+      });
+	  });*/
+
+    /* This was an attempt to add in a checkbox that showed and hid toggles.
+       It looks like we lost click functionality on the toggle without gaining it
+       on the dynamic panels, which doesn't make it significantly more useful
+
+    $('.exploder_init').click(function(){
+      if($(this).prop("checked") == true){
+        //If a panel has multiple states, show the toggle option
+        $(panel).each(function(){ //Loop over panels
+          if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
+            $(this).prepend('<div class="exploder_toggle">+</div>'); //Add a toggle as the first child
+            console.log('added');
+          }
+        });
+      }else{
+        $('.exploder_toggle').remove();
+        console.log('removed');
+
+      }
+    });*/
+
+    $(panel).each(function(){ //Loop over panels
+     if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
+       $(this).addClass('explodable');
+      }
+    });
+    $(body).addClass('explode');
+    $('.explodable').click(function(){
+      thisPanel = $(this);
+
+      //Set Headline text to the panel name
+      $(panelName).text(thisPanel.attr('data-label'));
+
+      //Copy over Dynamic Panel States
+      $(this).clone().appendTo(modal);
+
+      //Label each state
+      $('.panel_exploder_modal .panel_state').each(function(){
+        $(this).before('<h2 class="state_label"></h2>');
+        $(this).prev('.state_label').text($(this).attr('data-label'));
+      });
+
+      //Show Modal Window
+      $(modal).addClass('visible');
+    });
+
+
+    //Reset modal to raw state and hide it.
+    $(closeButton).click(function() {
+      $('.panel_exploder_modal .ax_dynamic_panel').remove();
+      $(modal).removeClass('visible');
+    });
+  });
+</script>
+<style>
+  .explodable:before{
+    content: "+";
+    text-align:right;
+    display: block;
+    position: absolute;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.5em;
+    color: #00F;
+    opacity: 1;
+  }
+
+  .exploder_init{
+    position: fixed;
+    top:0;
+    right:0;
+    display: block
+  }
+  .panel_exploder_modal{
+    width:100%;
+    height:100%;
+    position:fixed;
+    overflow: scroll;
+    display: none;
+    visibility: invisible;
+    z-index: 1000;
+    background-color: rgba(33,33,33,0.8);
+  }
+  .panel_exploder_modal.visible{
+    display:block;
+    visbility: visible;
+  }
+  .panel_name{
+    font-family: Helvetica, Arial, sans;
+    text-align: center;
+    color: #fff;
+  }
+  .panel_exploder_close{
+    position:absolute;
+    top:5px;
+    right:5px;
+    z-index:1003;
+    color:white;
+    font-weight:bold;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+  .panel_exploder_modal .ax_dynamic_panel{
+    z-index: 1001;
+    height: auto !important;
+    margin: 0 auto 0;
+    position: relative !important;
+  }
+  .state_label{
+    text-align: center;
+    color: white;
+    font-family: Helvetica,Arial,sans;
+    margin: 20px auto 5px;
+  }
+  .panel_exploder_modal .panel_state{
+    margin: 0 auto 0;
+    display:block !important;
+    visibility: visible !important;
+    position:relative !important;
+  }
+</style>
