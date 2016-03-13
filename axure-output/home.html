@@ -165,7 +165,7 @@
       <div id="u10_ann" class="annotation"></div>
     </div>
     <!-- PLUGIN BEGIN-->
-    <div class="exploder__toggles exploder--hidden">
+    <div class="exploder__toggles">
         <!--<input type="button" value="+" class="exploder__toggle" id="exploder__toggle--sample"></input>-->
     </div>
     <div class="exploder__modal exploder--hidden">
@@ -173,7 +173,7 @@
       <div class="modal__close">&times;</div>
       <h2 class="modal__stateName">Panel State Name</h2>
     </div>
-
+    <script type="text/javascript" src="jquery.actual.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
         body = $('body');
@@ -205,7 +205,16 @@
           //      1.2.3.1: Get panel x + y
           panelPosition = $(this).position();
           //      1.2.3.2: Get panel states w
-          panelWidth = $(this).outerWidth();
+          panelWidth = $('.panel_state:first-child').css("width");
+          panelWidth = $('#u0_state0').width();
+          //If height = 0 then it's coming through the viewer
+          if(panelWidth == '0'){
+            panelWidth = $(this).actual('width');
+            console.log(panelWidth);
+
+          }
+          //otherwise measure it with actual?
+
           //      1.2.3.3: x = panelX + stateW - toggleW Wait, shit, this is fragile if states can have multiple sizes. Is it worth trying to find the largest one?
           //               y = panelY
           toggleTarget = $('#'+ toggleID);
@@ -223,6 +232,7 @@
         $axure.internal(function($ax) {
           $ax.messageCenter.addMessageListener(function(message, data) {
               if(message == 'highlightInteractive') {
+                //  2.3: Show elements
                   if(data == true){
                     toggles.removeClass('exploder--hidden');
                   }
@@ -232,7 +242,6 @@
               }
           });
         });
-        //  2.3: Show elements
 
         //3: Explode Panel
         //  3.1: String manipulate to target panel ID
