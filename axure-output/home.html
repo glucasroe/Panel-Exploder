@@ -165,7 +165,7 @@
       <div id="u10_ann" class="annotation"></div>
     </div>
     <!-- PLUGIN BEGIN-->
-    <div class="exploder__toggles">
+    <div class="exploder__toggles exploder--hidden">
         <!--<input type="button" value="+" class="exploder__toggle" id="exploder__toggle--sample"></input>-->
     </div>
     <div class="exploder__modal exploder--hidden">
@@ -220,6 +220,18 @@
         //2: Show and hide functions
         //  2.1: Initialization
         //  2.2: Listen to changes
+        $axure.internal(function($ax) {
+          $ax.messageCenter.addMessageListener(function(message, data) {
+              if(message == 'highlightInteractive') {
+                  if(data == true){
+                    toggles.removeClass('exploder--hidden');
+                  }
+                  if(data == false){
+                    toggles.addClass('exploder--hidden');
+                  }
+              }
+          });
+        });
         //  2.3: Show elements
 
         //3: Explode Panel
@@ -230,7 +242,8 @@
           targetablePanel = $('#' + panelID);
         //  3.2: Copy panel contents into viewer window
           $(targetablePanel).clone().appendTo(modal);
-        //  3.3: Sort states to be in correct order - This might be hard
+        //  3.3: Sort states to be in correct order
+        //This might be hard
         //  3.4: Display viewer
           $(modal).removeClass('exploder--hidden');
         });
