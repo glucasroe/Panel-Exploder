@@ -244,10 +244,11 @@
         //  3.2: Copy panel contents into viewer window
           targetablePanel.clone().removeClass('pulsateBorder').attr('id',clonedPanelID).appendTo(modal);
         //  3.3: Sort states to be in correct order
-        //This might be hard
+        // ....?
+        // I think I need to do string manipulation of the IDs to determine the order that they're generated in, as the typical pattern is #panelid_stateStateID
         //  3.4: Label States
-          panelName.text(targetableClonedPanel.attr('data-label'));
-          $('.exploder__modal .panel_state').each(function(){
+          panelName.text(targetablePanel.attr('data-label'));
+          $(targetableClonedPanel, '.panel_state').each(function(){
             $(this).before('<h2 class="modal__stateName"></h2>');
             $(this).prev('.modal__stateName').text($(this).attr('data-label'));
           });
