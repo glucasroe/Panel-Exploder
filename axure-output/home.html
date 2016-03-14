@@ -246,6 +246,15 @@
         //  3.3: Sort states to be in correct order
         // ....?
         // I think I need to do string manipulation of the IDs to determine the order that they're generated in, as the typical pattern is #panelid_stateStateID
+        //shamelessly ripped from http://stackoverflow.com/a/21267434
+        /*$("#cat li").sort(function(a, b) {
+          return parseInt(a.id) - parseInt(b.id);
+          }).each(function() {
+            var elem = $(this);
+            elem.remove();
+            $(elem).appendTo("#cat");
+          });
+          */
         //  3.4: Label States
           panelName.text(targetablePanel.attr('data-label'));
           $(targetableClonedPanel, '.panel_state').each(function(){
