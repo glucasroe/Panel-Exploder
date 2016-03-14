@@ -171,7 +171,6 @@
     <div class="exploder__modal exploder--hidden">
       <h1 class="modal__title">Modal Title</h1>
       <div class="modal__close">&times;</div>
-      <h2 class="modal__stateName">Panel State Name</h2>
     </div>
     <script type="text/javascript">
       $(document).ready(function() {
@@ -184,12 +183,12 @@
         //Modal Elements
         modal = $('.exploder__modal');
         closeButton = $('.modal__close');
-        panelName = $('.panel_name');
+        panelName = $('.modal__title');
 
         //1: Build the annotations
         //  1.1: Create Annotation Template
         //  1.2: For each panel, place template
-        $('.ax_dynamic_panel').each(function(){ //Loop over panels
+        panel.each(function(){ //Loop over panels
          if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
 
           //    1.2.2: String manipulate to set ID
@@ -197,36 +196,28 @@
           toggleID = panelID + '--toggle';
 
           //    1.2.1: Duplicate template
-          $(toggles).append('<input type="button" value="+" class="exploder__toggle" id="' + toggleID + '"></input>');
+          toggles.append('<input type="button" value="+" class="exploder__toggle" id="' + toggleID + '"></input>');
 
           //    1.2.3: Measure panel placement
           //      1.2.3.1: Get panel x + y
           panelPosition = $(this).position();
-          //      1.2.3.2: Get panel states w
-          panelWidth = $('.panel_state:first-child').css("width");
-          panelWidth = $('#u0_state0').width();
-          //If height = 0 then it's coming through the viewer
-          if(panelWidth == '0'){
-            childState = $(this).find('.ax_shape');
-            panelWidth = $(childState).css('width');
 
-            //Still broken.
-          }
-          //otherwise measure it with actual?
-          console.log(panelWidth);
-          //      1.2.3.3: x = panelX + stateW - toggleW Wait, shit, this is fragile if states can have multiple sizes. Is it worth trying to find the largest one?
-          //               y = panelY
           toggleTarget = $('#'+ toggleID);
-          toggleW = $(toggleTarget).outerWidth()
-          toggleX = (panelPosition.left + panelWidth) - toggleW;
+          toggleX = panelPosition.left;
           toggleY = panelPosition.top;
           //    1.2.4: Apply values to template instance
-          $(toggleTarget).css({ top: toggleY + "px", left: toggleX + "px"});
-          }
+          toggleTarget.css({ top: toggleY + "px", left: toggleX + "px"});
+        }
         });
 
         //2: Show and hide functions
         //  2.1: Initialization
+        viewerTest = $('.ax_dynamic_panel').css("width");
+        //If height = 0 then it's coming through the viewer
+        console.log(viewerTest);
+        if(viewerTest == '0' || viewerTest == '0px'){
+          toggles.addClass('exploder--hidden');
+        }
         //  2.2: Listen to changes
         $axure.internal(function($ax) {
           $ax.messageCenter.addMessageListener(function(message, data) {
@@ -248,19 +239,27 @@
           toggleID = $(this).attr('ID');
           panelID = toggleID.substr(0, toggleID.length-8);
           targetablePanel = $('#' + panelID);
+          clonedPanelID = panelID + '--cloned';
+          targetableClonedPanel = $('#' + clonedPanelID);
         //  3.2: Copy panel contents into viewer window
-          $(targetablePanel).clone().appendTo(modal);
+          targetablePanel.clone().removeClass('pulsateBorder').attr('id',clonedPanelID).appendTo(modal);
         //  3.3: Sort states to be in correct order
         //This might be hard
-        //  3.4: Display viewer
-          $(modal).removeClass('exploder--hidden');
+        //  3.4: Label States
+          panelName.text(targetableClonedPanel.attr('data-label'));
+          $('.exploder__modal .panel_state').each(function(){
+            $(this).before('<h2 class="modal__stateName"></h2>');
+            $(this).prev('.modal__stateName').text($(this).attr('data-label'));
+          });
+        //  3.5: Display viewer
+          modal.removeClass('exploder--hidden');
         });
 
 
         //4: Close Modal
-        $(closeButton).click(function() {
+        closeButton.click(function() {
         //  4.1 Hide viewer
-          $(modal).addClass('exploder--hidden');
+          modal.addClass('exploder--hidden');
         //  4.2 Delete children
           $('.exploder__modal .ax_dynamic_panel').remove();
         });
@@ -296,6 +295,8 @@
         .exploder__modal{
           z-index: 1100;
           background-color: rgba(0,0,0,0.7);
+          position:fixed;
+          overflow:scroll;
         }
         .modal__close{
           position:absolute;
@@ -313,8 +314,11 @@
         .modal__title,.modal__stateName{
           font-family: Helvetica, Arial, sans;
           color: white;
+          text-align: center;
         }
-
+        .modal__stateName{
+          margin: 20px auto 5px;
+        }
         .exploder__modal .ax_dynamic_panel{
           z-index: 1001;
           height: auto !important;
@@ -322,19 +326,16 @@
           margin: 0 auto 0;
           position: relative !important;
         }
-        .state_label{
-          text-align: center;
-          color: white;
-          font-family: Helvetica,Arial,sans;
-          margin: 20px auto 5px;
-        }
+
         .exploder__modal .panel_state{
           margin: 0 auto 0;
           display:block !important;
           visibility: visible !important;
           position:relative !important;
         }
-
+        .exploder__modal .annotation{
+          display:none !important;
+        }
         .exploder--hidden{
           display:none;
           visability: none;
