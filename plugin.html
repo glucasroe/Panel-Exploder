@@ -135,9 +135,9 @@
     //2: Show and hide functions
     //  2.1: Initialization
     viewerTest = $('.ax_dynamic_panel').css("width");
-	console.log(viewerTest);
-    //If height = 0 then it's coming through the viewer
-    if(viewerTest == '0' || viewerTest == '0px'){
+
+    //See if it's coming through the viewer
+    if(window.top != window.self){
       toggles.addClass('exploder--hidden');
     }
 
