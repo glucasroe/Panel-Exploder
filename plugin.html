@@ -95,6 +95,12 @@
     toggles = $('.exploder__toggles');
     exploderToggle = $('.exploder__toggle');
 
+    //Test for Axure 8
+    isEight = $(panel).size();
+
+    if(isEight == 0){
+      panel = $('.panel_state').parent();
+    }
 
     //Modal Elements
     modal = $('.exploder__modal');
@@ -129,7 +135,7 @@
     //2: Show and hide functions
     //  2.1: Initialization
     viewerTest = $('.ax_dynamic_panel').css("width");
-
+	console.log(viewerTest);
     //If height = 0 then it's coming through the viewer
     if(viewerTest == '0' || viewerTest == '0px'){
       toggles.addClass('exploder--hidden');
@@ -159,12 +165,15 @@
       clonedPanelID = panelID + '--cloned';
 
     //  3.2: Copy panel contents into viewer window
-      targetablePanel.clone().removeClass('pulsateBorder').attr('id',clonedPanelID).appendTo(modal);
+      targetablePanel.clone().removeClass('pulsateBorder legacyPulsateBorder').attr('id',clonedPanelID).appendTo(modal);
 
     //  3.3: Sort states to be in correct order
      panelState = $('.exploder__modal .panel_state');
      panelInstance = $('.exploder__modal .ax_dynamic_panel');
 
+     if(isEight == 0){
+       panelInstance = $('.exploder__modal .panel_state').parent();
+     }
      panelState.each(function(){
        simpleID = $(this).attr('ID').split('state').pop();
        $(this).attr('ID',simpleID);
