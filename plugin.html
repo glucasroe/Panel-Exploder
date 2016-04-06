@@ -1,0 +1,211 @@
+<style>
+  .exploder__toggles,.exploder__modal{
+    width:100%;
+    height:100%;
+    display:block;
+    position:absolute;
+    margin:0;
+    top:0;
+    left:0;
+  }
+  .exploder__toggles{
+    z-index: 1000;
+    pointer-events:none;
+  }
+  .exploder__toggle{
+    position: absolute;
+    top:0;
+    left: 0;
+    border:0;
+    padding:0.25em 0.5em;
+    pointer-events: auto;
+    cursor: pointer;
+    color: red;
+    opacity: 0.5;
+    background-color: transparent;
+    outline: 0;
+    transition: opacity 0.25s;
+    font-size: 1em;
+  }
+  .exploder__toggle:hover{
+    opacity: 1;
+  }
+  .exploder__modal{
+    z-index: 1100;
+    background-color: rgba(0,0,0,0.7);
+    position:fixed;
+    overflow:scroll;
+  }
+  .modal__close{
+    position:absolute;
+    top:0;
+    right:0;
+    width:1em;
+    height:1em;
+    padding:0.5em;
+    margin:0;
+    color: white;
+    text-align:center;
+    cursor: pointer;
+    font-size:1.5em;
+  }
+  .modal__title,.modal__stateName{
+    font-family: Helvetica, Arial, sans;
+    color: white;
+    text-align: center;
+  }
+  .modal__stateName{
+    margin: 20px auto 5px;
+  }
+  .exploder__modal .ax_dynamic_panel{
+    z-index: 1001;
+    height: auto !important;
+    top: auto !important;
+    margin: 0 auto 0;
+    position: relative !important;
+    outline: 0;
+  }
+
+  .exploder__modal .panel_state{
+    margin: 0 auto 0;
+    display:block !important;
+    visibility: visible !important;
+    position:relative !important;
+  }
+  .exploder__modal .annotation{
+    display:none !important;
+  }
+  .exploder--hidden{
+    display:none;
+    visability: none;
+  }
+</style>
+
+<div class="exploder__toggles">
+    <!--<input type="button" value="+" class="exploder__toggle" id="exploder__toggle--sample"></input>-->
+</div>
+<div class="exploder__modal exploder--hidden">
+  <h1 class="modal__title">Modal Title</h1>
+  <div class="modal__close">&times;</div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function() {
+    body = $('body');
+    panel = $('.ax_dynamic_panel');
+    toggles = $('.exploder__toggles');
+    exploderToggle = $('.exploder__toggle');
+
+    //Test for Axure 8
+    isEight = $(panel).size();
+
+    if(isEight == 0){
+      panel = $('.panel_state').parent();
+    }
+
+    //Modal Elements
+    modal = $('.exploder__modal');
+    closeButton = $('.modal__close');
+    panelName = $('.modal__title');
+
+    //1: Build the annotations
+    //  1.1: Create Annotation Template
+    //  1.2: For each panel, place template
+    panel.each(function(){ //Loop over panels
+     if ( $(this).children('.panel_state').length > 1) { //If panel has more than one state
+
+      //    1.2.2: String manipulate to set ID
+      panelID = $(this).attr('id'); //Get
+      toggleID = panelID + '--toggle';
+
+      //    1.2.1: Duplicate template
+      toggles.append('<input type="button" value="+" class="exploder__toggle" id="' + toggleID + '"></input>');
+
+      //    1.2.3: Measure panel placement
+      //      1.2.3.1: Get panel x + y
+      panelPosition = $(this).position();
+
+      toggleTarget = $('#'+ toggleID);
+      toggleX = panelPosition.left;
+      toggleY = panelPosition.top;
+      //    1.2.4: Apply values to template instance
+      toggleTarget.css({ top: toggleY + "px", left: toggleX + "px"});
+    }
+    });
+
+    //2: Show and hide functions
+    //  2.1: Initialization
+    viewerTest = $('.ax_dynamic_panel').css("width");
+
+    //See if it's coming through the viewer
+    if(window.top != window.self){
+      toggles.addClass('exploder--hidden');
+    }
+
+    //  2.2: Listen to changes
+    $axure.internal(function($ax) {
+      $ax.messageCenter.addMessageListener(function(message, data) {
+          if(message == 'highlightInteractive') {
+            //  2.3: Show elements
+              if(data == true){
+                toggles.removeClass('exploder--hidden');
+              }
+              if(data == false){
+                toggles.addClass('exploder--hidden');
+              }
+          }
+      });
+    });
+
+    //3: Explode Panel
+    //  3.1: String manipulate to target panel ID
+    $('.exploder__toggle').click(function(){
+      toggleID = $(this).attr('ID');
+      panelID = toggleID.substr(0, toggleID.length-8);
+      targetablePanel = $('#' + panelID);
+      clonedPanelID = panelID + '--cloned';
+
+    //  3.2: Copy panel contents into viewer window
+      targetablePanel.clone().removeClass('pulsateBorder legacyPulsateBorder').attr('id',clonedPanelID).appendTo(modal);
+
+    //  3.3: Sort states to be in correct order
+     panelState = $('.exploder__modal .panel_state');
+     panelInstance = $('.exploder__modal .ax_dynamic_panel');
+
+     if(isEight == 0){
+       panelInstance = $('.exploder__modal .panel_state').parent();
+     }
+     panelState.each(function(){
+       simpleID = $(this).attr('ID').split('state').pop();
+       $(this).attr('ID',simpleID);
+     });
+     panelState.sort(function(a, b) { //shamelessly ripped from http://stackoverflow.com/a/21267434
+       return parseInt(a.id) - parseInt(b.id);
+       }).each(function() {
+         var elem = $(this);
+         elem.remove();
+         $(elem).appendTo(panelInstance);
+       });
+
+    //  3.4: Label States
+      panelName.text(targetablePanel.attr('data-label'));
+      panelState.each(function(){
+        $(this).before('<h2 class="modal__stateName"></h2>');
+        $(this).prev('.modal__stateName').text($(this).attr('data-label'));
+      });
+
+    //  3.5: Display viewer
+      modal.removeClass('exploder--hidden');
+    });
+
+
+    //4: Close Modal
+    closeButton.click(function() {
+    //  4.1 Hide viewer
+      modal.addClass('exploder--hidden');
+    //  4.2 Delete children
+      panelInstance.remove();
+    });
+  });
+  </script>
+
+<!-- PLUGIN END-->
