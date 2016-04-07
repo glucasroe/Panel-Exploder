@@ -232,16 +232,15 @@
         position: relative !important;
         outline: 0;
       }
-
       .exploder__modal .panel_state{
         margin: 0 auto 0;
         display:block !important;
         visibility: visible !important;
         position:relative !important;
       }
-      .exploder__modal .annotation{
+      /*.exploder__modal .annotation{
         display:none !important;
-      }
+      }*/
       .exploder--hidden{
         display:none;
         visability: none;
@@ -262,6 +261,12 @@
         toggles = $('.exploder__toggles');
         exploderToggle = $('.exploder__toggle');
 
+        //Test for Axure 8
+        isEight = $(panel).size();
+
+        if(isEight == 0){
+          panel = $('.panel_state').parent();
+        }
 
         //Modal Elements
         modal = $('.exploder__modal');
@@ -295,10 +300,8 @@
 
         //2: Show and hide functions
         //  2.1: Initialization
-        viewerTest = $('.ax_dynamic_panel').css("width");
-
-        //If height = 0 then it's coming through the viewer
-        if(viewerTest == '0' || viewerTest == '0px'){
+        //See if it's coming through the viewer
+        if(window.top != window.self){
           toggles.addClass('exploder--hidden');
         }
 
@@ -319,19 +322,38 @@
 
         //3: Explode Panel
         //  3.1: String manipulate to target panel ID
+        annotationShadowIDs = new Array();
         $('.exploder__toggle').click(function(){
           toggleID = $(this).attr('ID');
           panelID = toggleID.substr(0, toggleID.length-8);
           targetablePanel = $('#' + panelID);
           clonedPanelID = panelID + '--cloned';
 
-        //  3.2: Copy panel contents into viewer window
-          targetablePanel.clone().removeClass('pulsateBorder').attr('id',clonedPanelID).appendTo(modal);
+        // Lets try to target the notes
 
+        $axure.internal(function($ax){
+          $ax.annotation.ToggleWorkflow(e, elementId, 300, 150, false)
+        });
+        console.log('peanuts');
+*/
+        //  3.2: Copy panel contents into viewer window
+          targetablePanel.clone().removeClass('pulsateBorder legacyPulsateBorder').attr('id',clonedPanelID).appendTo(modal);
+
+          annotation = $(targetablePanel).next('.annotation');
+          annotationID = annotation.attr('ID');
+          annotationShadowID = annotationID + '-';
+
+          annotationShadowIDs.push(annotationShadowID);
+
+          annotation.clone().appendTo(modal);
+          annotation.attr('ID',annotationShadowID);
         //  3.3: Sort states to be in correct order
          panelState = $('.exploder__modal .panel_state');
          panelInstance = $('.exploder__modal .ax_dynamic_panel');
 
+         if(isEight == 0){
+           panelInstance = $('.exploder__modal .panel_state').parent();
+         }
          panelState.each(function(){
            simpleID = $(this).attr('ID').split('state').pop();
            $(this).attr('ID',simpleID);
@@ -362,10 +384,10 @@
           modal.addClass('exploder--hidden');
         //  4.2 Delete children
           panelInstance.remove();
+          console.log(annotationShadowID);
         });
       });
       </script>
-
     <!-- PLUGIN END-->
   </body>
 </html>
