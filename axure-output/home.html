@@ -176,7 +176,7 @@
         left:0;
       }
       .exploder__toggles{
-        z-index: 1000;
+        z-index: 450;
         pointer-events:none;
       }
       .exploder__toggle{
@@ -198,7 +198,7 @@
         opacity: 1;
       }
       .exploder__modal{
-        z-index: 1100;
+        z-index: 500;
         background-color: rgba(0,0,0,0.7);
         position:fixed;
         overflow:scroll;
@@ -225,7 +225,7 @@
         margin: 20px auto 5px;
       }
       .exploder__modal .ax_dynamic_panel{
-        z-index: 1001;
+        z-index: 501;
         height: auto !important;
         top: auto !important;
         margin: 0 auto 0;
@@ -322,7 +322,6 @@
 
         //3: Explode Panel
         //  3.1: String manipulate to target panel ID
-        annotationShadowIDs = new Array();
         $('.exploder__toggle').click(function(){
           toggleID = $(this).attr('ID');
           panelID = toggleID.substr(0, toggleID.length-8);
@@ -330,23 +329,12 @@
           clonedPanelID = panelID + '--cloned';
 
         // Lets try to target the notes
+          annotation = $(targetablePanel).next('.annotation');
+          annotation.clone().appendTo(modal);
 
-        $axure.internal(function($ax){
-          $ax.annotation.ToggleWorkflow(e, elementId, 300, 150, false)
-        });
-        console.log('peanuts');
-*/
         //  3.2: Copy panel contents into viewer window
           targetablePanel.clone().removeClass('pulsateBorder legacyPulsateBorder').attr('id',clonedPanelID).appendTo(modal);
 
-          annotation = $(targetablePanel).next('.annotation');
-          annotationID = annotation.attr('ID');
-          annotationShadowID = annotationID + '-';
-
-          annotationShadowIDs.push(annotationShadowID);
-
-          annotation.clone().appendTo(modal);
-          annotation.attr('ID',annotationShadowID);
         //  3.3: Sort states to be in correct order
          panelState = $('.exploder__modal .panel_state');
          panelInstance = $('.exploder__modal .ax_dynamic_panel');
@@ -375,6 +363,24 @@
 
         //  3.5: Display viewer
           modal.removeClass('exploder--hidden');
+
+          $('.exploder__modal .annnoteimage').each(function(){
+            if(this.id){
+                this.id = this.id+"exploder";
+              }
+          });
+          $axure.internal(function($ax) {
+            var query = $ax(function(dObj){ return dObj.annotation; })
+            query.each(function(dObj, elementId) {
+              if(!dObj.annotation) return;
+              $('#' + elementId + 'Noteexploder').click(function(e) {
+                $ax.annotation.ToggleWorkflow(e, elementId, 300, 150, false);
+                return false;
+              });
+            });
+          });
+
+
         });
 
 
